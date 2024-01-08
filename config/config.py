@@ -1,6 +1,10 @@
 from config.structures import ConfigBranch, ConfigBase
 
 
+class BotConfig(ConfigBranch):
+    token: str
+    log_chat: int
+
 class DBConfig(ConfigBranch):
     type: str
     name: str
@@ -27,4 +31,5 @@ class DBConfig(ConfigBranch):
 class Config(ConfigBase):
     """Connect config branches (class from ConfigBranch) here"""
 
+    bot: BotConfig
     db: DBConfig

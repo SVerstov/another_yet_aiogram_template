@@ -1,3 +1,4 @@
+import logging
 import sys
 import tomllib
 from pathlib import Path
@@ -15,6 +16,15 @@ def get_module_filter(module_name):
         return module == module_name
 
     return filter
+
+
+class InterceptHandler(logging.Handler):
+    """Catch standart logging records"""
+
+    def emit(self, record):
+        logger.opt(depth=6, exception=record.exc_info).log(
+            record.levelname, record.getMessage()
+        )
 
 
 def setup_loguru():
@@ -41,7 +51,10 @@ def setup_loguru():
             module_conf = {**base_config, **module_conf}
             setup_logger_for_module(logs_folder, module_name, module_conf)
 
-        logger.info("Logging configured successfully")
+    # intercept other handlers:
+    logging.basicConfig(handlers=[InterceptHandler()], level=logging.DEBUG)
+
+    logger.info("Logging configured successfully")
 
 
 def setup_logger_for_module(logs_folder: Path, module_name: str, module_conf: dict):

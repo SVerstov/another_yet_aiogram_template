@@ -47,7 +47,9 @@ class ConfigBranch(BaseModel):
 class ConfigBase:
     conf_path: Path = Path("config/config.toml")
 
-    def __init__(self):
+    def __init__(self, conf_path: Path | None = None) -> None:
+        if conf_path:
+            self.conf_path = conf_path
         with open(self.conf_path, "rb") as f:
             config_dct = tomllib.load(f)
 

@@ -15,6 +15,7 @@ alembic = "^1.13.1"
 aiosqlite = "^0.19.0"
 asyncpg = "^0.29.0"
 aiogram = "^3.3.0"
+pytest-asyncio = "^0.23.3"
 
 [tool.poetry.group.dev]
 optional = true
@@ -23,6 +24,7 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 black = "^23.12.1"
 pytest = "^7.4.4"
+pytest-asyncio = "^0.23.3"
 
 [build-system]
 requires = ["poetry-core"]
