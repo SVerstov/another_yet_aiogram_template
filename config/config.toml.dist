@@ -1,0 +1,23 @@
+[bot]
+token = "5519140796:AAHhyPF7iontUW3AOosoiLJ1jeoPIDHePdw"
+parse_mode = "HTML"
+admins = [403196518]
+log_chat = 403196518 # chat id for logs
+
+[db] # for sqlite
+type = "sqlite"
+name = 'db/db.sqlite'
+autoflush = false
+show_echo = true
+
+#[db] # for postgres
+#type = "postgresql"
+#connector = "asyncpg"
+#host_and_port = "postgres"
+#name = "news_parser"
+#autiflush=false
+#login = "postgres"make
+#password = "superpass"
+#show_echo = true  # if enable shows all SQL queries and results
+#pool_size=5
+#max_overflow=10
