@@ -8,7 +8,7 @@ from aiogram.methods import SendMessage
 from aiogram.types import Update
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from bot import setup_bot
+from bot import setup_dp
 from config import Config
 
 import pytest
@@ -57,7 +57,7 @@ def bot():
 
 @pytest_asyncio.fixture(scope='session')
 async def dp(config: Config):
-    dp = setup_bot(config)
+    dp = setup_dp(config)
 
     await dp.emit_startup()
     try:

@@ -39,7 +39,7 @@ def setup_middleware(dp, config):
     dp.update.middleware(ConfigMiddleware(config))
 
 
-def setup_bot(config: Config) -> Dispatcher:
+def setup_dp(config: Config) -> Dispatcher:
     dp = Dispatcher(storage=MemoryStorage())
 
     setup_middleware(dp, config)
@@ -53,7 +53,7 @@ def run_bot(config: Config):
         token=config.bot.token,
         parse_mode=config.bot.parse_mode,
     )
-    dp = setup_bot(config)
+    dp = setup_dp(config)
 
     try:
         dp.run_polling(bot)
