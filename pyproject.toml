@@ -17,6 +17,7 @@ asyncpg = "^0.29.0"
 aiogram = "^3.3.0"
 pytest-asyncio = "^0.23.3"
 aiogram-dialog = "^2.1.0"
+redis = "^5.0.1"
 
 [tool.poetry.group.dev]
 optional = true

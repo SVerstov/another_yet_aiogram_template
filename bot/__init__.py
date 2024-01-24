@@ -4,8 +4,10 @@ from aiogram import Bot, Dispatcher, Router
 from aiogram.exceptions import TelegramAPIError
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder
 from aiogram.types import ErrorEvent, Update
 from aiogram_dialog import DialogManager
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 from sqlalchemy.orm import close_all_sessions
 
@@ -40,7 +42,7 @@ def setup_middleware(dp, config):
 
 
 def setup_dp(config: Config) -> Dispatcher:
-    dp = Dispatcher(storage=MemoryStorage())
+    dp = Dispatcher(storage=get_redis_storage(config))
 
     setup_middleware(dp, config)
 
@@ -62,16 +64,11 @@ def run_bot(config: Config):
         logger.info("Bot stopped")
 
 
-# def get_bot_storage(config):
-#     if config.cache.use_cache:
-#         redis = Redis(
-#             host=config.cache.host,
-#             port=config.cache.port,
-#             db=config.cache.db_num_bot,
-#             # password=config.cache.password,
-#         )
-#         storage = RedisStorage(redis=redis, key_builder=DefaultKeyBuilder(with_destiny=True))
-#
-#     else:
-#         storage = MemoryStorage()
-#     return storage
+def get_redis_storage(config):
+    redis = Redis(
+        host=config.cache.host,
+        port=config.cache.port,
+        db=config.cache.db_num_bot,
+        password=config.cache.password,
+    )
+    return RedisStorage(redis=redis, key_builder=DefaultKeyBuilder(with_destiny=True))

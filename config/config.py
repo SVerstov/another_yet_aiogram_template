@@ -6,7 +6,7 @@ from config.structures import ConfigBranch, ConfigBase
 class BotConfig(ConfigBranch):
     token: str
     admins: list[int]
-    parse_mode: Literal["HTML", "Markdown", "MarkdownV2"]  = "HTML"
+    parse_mode: Literal["HTML", "Markdown", "MarkdownV2"] = "HTML"
     log_chat: int
 
 
@@ -34,8 +34,17 @@ class DBConfig(ConfigBranch):
             )
 
 
+class CacheConfig(ConfigBranch):
+    host: str
+    port: int
+    db_num: int
+    ttl: int
+    password: str | None = None
+    key_autoprefix: str | None = None
+
 class Config(ConfigBase):
     """Connect config branches (class from ConfigBranch) here"""
 
     bot: BotConfig
     db: DBConfig
+    cache: CacheConfig
