@@ -1,9 +1,14 @@
+from typing import Literal
+
 from config.structures import ConfigBranch, ConfigBase
 
 
 class BotConfig(ConfigBranch):
     token: str
+    admins: list[int]
+    parse_mode: Literal["HTML", "Markdown", "MarkdownV2"]  = "HTML"
     log_chat: int
+
 
 class DBConfig(ConfigBranch):
     type: str
@@ -13,6 +18,7 @@ class DBConfig(ConfigBranch):
     host_and_port: str | None = None
     login: str | None = None
     password: str | None = None
+    autoflush: bool = True
     show_echo: bool = False
     pool_size: int | None = None
     max_overflow: int | None = None

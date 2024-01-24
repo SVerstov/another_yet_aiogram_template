@@ -1,7 +1,6 @@
 from datetime import date, timedelta, datetime
 
 from aiogram.types import User as TgUser
-from asyncpg import UniqueViolationError
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -61,7 +60,6 @@ class UserDAO(BaseDAO[User]):
             .returning(User)
         )
         result = await self.session.execute(update_stmt)
-        await self.commit()
         return result.scalar_one_or_none()
 
     async def _save_new_user(self, tg_user) -> User:
@@ -75,6 +73,5 @@ class UserDAO(BaseDAO[User]):
             last_name=tg_user.last_name,
         )
         self.session.add(user)
-        await self.commit()
-        user.register_at_this_moment = True
+        await self.session.flush()
         return user

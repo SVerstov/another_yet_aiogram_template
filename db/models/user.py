@@ -1,6 +1,6 @@
-from sqlalchemy import DateTime, text, Integer, BigInteger, Boolean, String
+from sqlalchemy import DateTime, text, Integer, BigInteger, Boolean, String, Date
 from sqlalchemy.orm import Mapped, mapped_column as mc
-from datetime import datetime
+from datetime import datetime, date
 from db.base import Base
 
 
@@ -14,14 +14,13 @@ class User(Base):
     last_name: Mapped[str | None]
     phone: Mapped[str | None]
 
-    last_seen = Mapped[datetime]
+    last_active_at: Mapped[date] = mc(Date, default=datetime.today())
     registered_at: Mapped[datetime] = mc(
         DateTime,
         default=datetime.now(),
         server_default=text("CURRENT_TIMESTAMP"),
         nullable=False,
     )
-    is_admin = mc(Boolean, default=False, nullable=False)
     is_bot_blocked = mc(Boolean, default=False, nullable=False)
     is_blocked = mc(Boolean, default=False, nullable=False)
 

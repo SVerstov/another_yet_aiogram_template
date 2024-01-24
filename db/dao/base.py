@@ -1,4 +1,4 @@
-from typing import List, TypeVar, Type, Generic, Iterable
+from typing import List, TypeVar, Type, Generic, Iterable, AsyncIterator, Any
 
 from sqlalchemy import (
     delete,
@@ -6,6 +6,7 @@ from sqlalchemy import (
     select,
     update,
     Result,
+    ScalarResult,
     text,
     ClauseElement,
     UnaryExpression,
@@ -13,6 +14,7 @@ from sqlalchemy import (
     ColumnElement,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Mapped
 
 from sqlalchemy.sql.base import ExecutableOption, Executable
 from db.base import Base
@@ -31,11 +33,11 @@ class BaseDAO(Generic[Model]):
         *whereclauses: ClauseElement,
         options: Iterable[ExecutableOption] | ExecutableOption | None = None,
         limit: int | None = None,
-        offset: int | None = None,
         order_by: ColumnElement | None = None,
+        offset: int | None = None,
         join: _JoinTargetArgument | None = None,
         get_only: ColumnElement | None = None,
-    ) -> list[Model]:
+    ) -> list[Model] | list[Any]:
         """
         Fetch all records from the database with optional filtering, limiting, and offset.
 
@@ -67,70 +69,70 @@ class BaseDAO(Generic[Model]):
                 stmt = stmt.options(*options)
         if limit:
             stmt = stmt.limit(limit)
-        if offset:
-            stmt = stmt.offset(offset)
         if order_by is not None:
             stmt = stmt.order_by(order_by)
+        if offset:
+            stmt = stmt.offset(offset)
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def get_chunk_iterator(self, *whereclauses, chunk_size: int, offset: int = 0):
+    async def get_chunk_iterator(
+        self, *whereclauses: ClauseElement, chunk_size: int = 10_000, offset: int = 0
+    ) -> AsyncIterator[List[Model]]:
         """
         Generator function that fetches records from the database in batches.
-
-        :param whereclauses: Additional SQLAlchemy WHERE clauses to filter the results. Each will be added to the query.
-        :param chunk_size: The size of the batches to fetch.
-        :param offset: Skip first lines quantity.
+        Usage example:
+        async for user_batch in user_dao.get_iterator(User.age > 18, chunk_size=100):
+            for user in user_batch:
+                print(user)
         """
-
-        while True:
-            # Get the next batch of records
-            records = await self.get_many(
-                *whereclauses, limit=chunk_size, offset=offset, order_by=self.model.id
-            )
-
-            # If no more records, stop
-            if not records:
-                break
-
-            # Yield the records
-            yield records
-
-            # Update the offset for the next batch
-            offset += chunk_size
-
-    async def get_iterator(self, *whereclauses, chunk_size: int = 10_000):
         stmt = select(self.model)
         if whereclauses:
             stmt = stmt.where(*whereclauses)
+        if offset:
+            stmt = stmt.offset(offset)
         result = await self.session.stream(stmt.execution_options(yield_per=chunk_size))
-        return result.scalars()
+        async for batch in result.partitions():
+            yield batch
 
-    async def get_last_elem(self) -> Model:
-        stmt = select(self.model).order_by(self.model.id.desc()).limit(1)
-        res = await self.session.execute(stmt)
-        return res.scalar_one()
+    async def get_last(
+        self,
+        *whereclauses: ClauseElement,
+        order_by: ColumnElement = None,
+    ) -> Model | None:
+        """
+        An instance of the Model class representing the last row that matches the given WHERE clauses and ordered by the specified column.
+        If no matching row is found, None is returned.
+        """
+        if order_by is not None:
+            order_by = order_by
+        else:
+            order_by = self.model.id
+        return await self.get_first(*whereclauses, order_by=order_by.desc())
 
     async def get_all(self):
         return await self.get_many()
 
     async def get_by_id(self, id_: int) -> Model | None:
-        return await self.get_one(self.model.id == id_)
+        stmt = select(self.model).where(self.model.id == id_)
+        return (await self.session.execute(stmt)).scalar_one_or_none()
 
-    async def get_one(
-        self, *whereclauses: ClauseElement, offset: int = 0
+    async def get_first(
+        self,
+        *whereclauses: ClauseElement,
+        order_by: ColumnElement = None,
+        offset: int = 0,
     ) -> Model | None:
         """
-        Get one model from the database with whereclauses
-        :param whereclauses: Clauses by which entry will be found
-        :param offset: Number of initial results to skip (default is 0)
-        :param order_by: Column or columns to order the results
-        :return: Model if found, else None
+        Get one model from the database
         """
         stmt = select(self.model)
         if whereclauses:
             stmt = stmt.where(*whereclauses)
-        stmt = stmt.order_by(self.model.id)
+        if order_by is None:
+            stmt = stmt.order_by(self.model.id)
+        else:
+            stmt = stmt.order_by(order_by)
         stmt = stmt.offset(offset).limit(1)
         return (await self.session.execute(stmt)).scalar_one_or_none()
 
@@ -143,7 +145,6 @@ class BaseDAO(Generic[Model]):
             raise AttributeError("Func delete need at least one whereclause")
         statement = delete(self.model).where(*whereclauses)
         res = await self.session.execute(statement)
-        await self.session.commit()
         return res.rowcount
 
     def delete_obj(self, obj: Model):
@@ -170,12 +171,6 @@ class BaseDAO(Generic[Model]):
         result = await self.session.execute(stmt)
         return result.scalar_one()
 
-    async def commit(self):
-        await self.session.commit()
-
-    async def flush(self, *objects):
-        await self.session.flush(objects)
-
     async def update_records(self, *whereclauses, **values) -> int:
         """
         Update models from the database
@@ -200,7 +195,6 @@ class BaseDAO(Generic[Model]):
         if not rowcount:
             new_record = self.model(**values)
             self.session.add(new_record)
-            await self.session.commit()
             return new_record
 
         return rowcount

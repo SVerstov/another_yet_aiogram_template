@@ -1,4 +1,5 @@
-.PHONY: init migrate migrations downgrade run parse update
+.PHONY: init migrate migrations downgrade
+
 
 init:
 	poetry install --no-root
