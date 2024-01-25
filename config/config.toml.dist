@@ -1,5 +1,5 @@
 [bot]
-token = "5519140796:AAHhyPF7iontUW3AOosoiLJ1jeoPIDHePdw"
+token = "YOUR_TOKEN"
 parse_mode = "HTML"
 admins = [403196518]
 log_chat = 403196518 # chat id for logs
@@ -16,7 +16,7 @@ show_echo = true
 #host_and_port = "postgres"
 #name = "news_parser"
 #autiflush=false
-#login = "postgres"make
+#login = "postgres"
 #password = "superpass"
 #show_echo = true  # if enable shows all SQL queries and results
 #pool_size=5

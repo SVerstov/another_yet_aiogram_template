@@ -68,7 +68,7 @@ def get_redis_storage(config):
     redis = Redis(
         host=config.cache.host,
         port=config.cache.port,
-        db=config.cache.db_num_bot,
+        db=config.cache.db_num,
         password=config.cache.password,
     )
     return RedisStorage(redis=redis, key_builder=DefaultKeyBuilder(with_destiny=True))

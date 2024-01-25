@@ -1,25 +1,12 @@
 from redis.asyncio.client import Redis
+from redis.commands.core import ResponseT
 
 from config import CacheConfig
 
 
-# from config.conf_loader.branches import CacheConfig
-
-
 class Prefix:
     USER = "user"
-    S_POSITIONS_JSON = "spj"
-    POSITIONS_RESULT = "pos_res"
 
-    COMMISSION = "commission"
-    WAREHOUSE_RATIO = "wh_ratio"
-
-    IMAGE_ID = "img_id"
-    USER_MINI_STATS = "usr_stats"
-    TMP_AUTH = "tmp_auth"
-    SEO_GPT_DATA = "seogptdata"
-    SEO_GPT_RESULT = "seogptres"
-    ADD_EMPLOYEE_LINK = "add_emp_link"
 
 
 class Cache:
@@ -42,7 +29,7 @@ class Cache:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.redis.close()
 
-    def add_prefix(self, key, prefix):
+    def add_prefix(self, key, prefix) -> str:
         if prefix:
             key = f"{prefix}:{key}"
         if self.config.key_autoprefix:
@@ -51,10 +38,9 @@ class Cache:
         return key
 
     async def set(self, key, value, prefix=None, ttl: int = None) -> bool:
-        if self.config.use_cache:
-            key = self.add_prefix(key, prefix)
-            ttl = ttl or self.config.ttl
-            return await self.redis.set(key, value, ex=ttl)
+        key = self.add_prefix(key, prefix)
+        ttl = ttl or self.config.ttl
+        return await self.redis.set(key, value, ex=ttl)
 
     async def get(self, key, prefix=None):
         key = self.add_prefix(key, prefix)
@@ -76,5 +62,5 @@ class Cache:
         if keys_with_prefix:
             return await self.redis.delete(*keys_with_prefix)
 
-    async def flush_all(self) -> bool:
+    async def flush_all(self) -> ResponseT:
         return await self.redis.flushall()
