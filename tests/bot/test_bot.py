@@ -1,7 +1,5 @@
 import os
-from datetime import datetime
 from pathlib import Path
-from unittest.mock import AsyncMock
 
 import pytest
 import pytest_asyncio
@@ -9,7 +7,6 @@ from aiogram import Dispatcher
 from aiogram.methods import SendMessage
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from bot.start import start
 from config import Config
 from tests.db.utils import create_tables, drop_all_tables
 from tests.mocked_bot import MockedBot

@@ -1,3 +1,13 @@
+# Overview
+Aiogram template for scalable bot. 
+Database - postrges/sqlite 
+Migrations - alembic
+Storage/cache - redis
+Tests - pytest
+Logging - loguru
+
+# Setup
+Before start be sure you have a poetry https://python-poetry.org/
 
 # Config system
 ## Overview

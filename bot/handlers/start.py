@@ -1,14 +1,27 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 
+from cache import Cache
 from config import Config
-from db import DAO, User
+from db import DAO, User, Chat
 
 start_router = Router()
 
 
 @start_router.message(F.text == "/start")
 async def start(message: Message, config: Config):
+    await message.answer("ok")
+
+
+@start_router.message(F.text == "/test")
+async def test(
+    message: Message,
+    config: Config,
+    user: User,
+    chat: Chat | None,
+    dao: DAO,
+    cache: Cache,
+):
     await message.answer("ok")
 
 

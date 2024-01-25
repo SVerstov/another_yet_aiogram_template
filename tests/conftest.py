@@ -8,7 +8,7 @@ from aiogram.methods import SendMessage
 from aiogram.types import Update
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from bot import setup_dp
+from bot.setup_bot import setup_dp
 from config import Config
 
 import pytest
