@@ -1,0 +1,33 @@
+[bot]
+token = "5519140796:AAHhyPF7iontUW3AOosoiLJ1jeoPIDHePdw"
+parse_mode = "HTML"
+admins = [403196518]
+log_chat = 403196518 # chat id for logs
+
+[db] # for sqlite
+type = "sqlite"
+name = ':memory:'
+autoflush = false
+show_echo = false
+
+#[db] # for postgres
+#type = "postgresql"
+#name = "test_db"
+##connector = "psycopg"
+#connector = "asyncpg"
+#host_and_port = "192.168.0.10:5433"
+#autoflush = false
+#login = "postgres"
+#password = "020390"
+#show_echo = false  # if enable shows all SQL queries and results
+#pool_size = 5
+#max_overflow = 10
+
+
+[cache]
+host = "localhost"
+port = 6379
+#password = "your_password"
+db_num = 0
+key_autoprefix = ""
+ttl = 900 # cache lifetime in seconds

@@ -12,7 +12,7 @@ def get_module_filter(module_name):
     """
 
     def filter(record):
-        module = record["extra"].get("module") or record["name"].split(".")[0]
+        module = record["extra"].get("name") or record["name"].split(".")[0]
         return module == module_name
 
     return filter

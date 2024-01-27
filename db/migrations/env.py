@@ -20,7 +20,7 @@ config = context.config
 # redirection record from logging to logu
 class AlembicLogHandler(logging.Handler):
     def emit(self, record):
-        logger_opt = logger.bind(module="alembic")
+        logger_opt = logger.bind(name="alembic")
         logger_opt.log(record.levelname, record.getMessage())
 
 

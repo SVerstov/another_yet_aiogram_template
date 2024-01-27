@@ -1,0 +1,31 @@
+[console]
+# doesn't use base_config
+level = "INFO"
+
+[base_config]
+level = "INFO"
+rotation="3 MB"
+compression="zip"
+
+
+[bot]
+file = "bot.log"
+level = "INFO"
+
+[aiogram]
+# messages fron aiogram lib
+file = "bot.log"
+level = "DEBUG"
+
+[config]
+file = "config.log"
+level = "INFO"
+
+[alembic]
+# log migrations
+file = "alembic.log"
+
+[all]
+# collect all log messages.
+level = "ERROR"
+file = "all.log"

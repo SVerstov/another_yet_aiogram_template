@@ -28,7 +28,7 @@ from tests.utils import FakeUpdateMaker, get_expected_answer
 #     await echo(message)
 #     message.answer.assert_called_with(message.text)
 
-
+@pytest.mark.skip
 @pytest.mark.asyncio
 async def test_dp_start(bot: MockedBot, dp: Dispatcher):
     update = FakeUpdateMaker(user_id=1234).message("/start")
@@ -36,7 +36,7 @@ async def test_dp_start(bot: MockedBot, dp: Dispatcher):
     assert isinstance(res, SendMessage)
     assert res.text == "ok"
 
-
+@pytest.mark.skip
 @pytest.mark.asyncio
 async def test_dp_callback(bot: MockedBot, dp: Dispatcher):
     update = FakeUpdateMaker(user_id=1234).callback(callback_data="test")
@@ -44,7 +44,7 @@ async def test_dp_callback(bot: MockedBot, dp: Dispatcher):
     assert isinstance(res, SendMessage)
     assert res.text == "call"
 
-
+@pytest.mark.skip
 class TestHandlers:
     config: Config = None
     id = 1

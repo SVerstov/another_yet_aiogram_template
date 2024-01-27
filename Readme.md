@@ -75,7 +75,7 @@ If you want to write logs from a different module than the one you are currently
 This allows you to direct the log output to a specific log file associated with that module
 ```python
 from loguru import logger
-pay_logger = logger.bind(module='payments')
+pay_logger = logger.bind(name='payments')
 # Don't forget to configure [payments] in toml file
 pay_logger.info('This log will be written in payments.log')
 ```
