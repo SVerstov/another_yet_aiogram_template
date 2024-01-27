@@ -1,5 +1,5 @@
 [bot]
-token = "5519140796:AAHhyPF7iontUW3AOosoiLJ1jeoPIDHePdw"
+token = "Your token"
 parse_mode = "HTML"
 admins = [403196518]
 log_chat = 403196518 # chat id for logs
