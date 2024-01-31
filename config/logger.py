@@ -27,7 +27,7 @@ class InterceptHandler(logging.Handler):
         )
 
 
-def setup_loguru():
+def setup_logger():
     """
     Set up logging configuration.
 

@@ -1,26 +1,43 @@
 import asyncio
 import logging.config
-from logging.handlers import RotatingFileHandler
+
 from loguru import logger
 from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.future import create_engine
 
-from config import Config, setup_loguru
+from config import Config, setup_logger
 from db.base import Base
 
-setup_loguru()
+setup_logger()
 
 db_uri = Config().db.uri
 config = context.config
+
+IGNORE_TABLE_NAME_STARTSWITH = []  # add tablenames to ignore in migration generation
+
+
+def include_object(object, name, type_, reflected, compare_to):
+    """
+    Should you include this table or not?
+    """
+    for table in IGNORE_TABLE_NAME_STARTSWITH:
+        if type_ == "table" and (
+            name.startswith(table) or object.info.get("skip_autogenerate", False)
+        ):
+            return False
+
+    if type_ == "column" and object.info.get("skip_autogenerate", False):
+        return False
+    return True
 
 
 # Setup loguru for alembic
 # redirection record from logging to logu
 class AlembicLogHandler(logging.Handler):
     def emit(self, record):
-        logger_opt = logger.bind(name="alembic")
+        logger_opt = logger.bind(module="alembic")
         logger_opt.log(record.levelname, record.getMessage())
 
 
@@ -57,6 +74,7 @@ def run_migrations_offline():
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_object=include_object,
     )
 
     with context.begin_transaction():
@@ -64,7 +82,11 @@ def run_migrations_offline():
 
 
 def do_run_migrations(connection):
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        include_object=include_object,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
@@ -86,7 +108,11 @@ async def run_migrations_online():
     )
 
     async with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            include_object=include_object,
+        )
 
         await connection.run_sync(do_run_migrations)
 
