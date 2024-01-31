@@ -1,3 +1,5 @@
+# This is a draft. Template not ready yet!
+
 # Overview
 Aiogram template for scalable bot. 
 Database - postrges/sqlite 
