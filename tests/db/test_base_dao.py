@@ -42,7 +42,9 @@ async def test_get_chunk_iterator(dao_w_users: DAO):
     async for chunk in user_chunks:
         assert len(chunk) == 10
         count += len(chunk)
+        assert isinstance(chunk[0], User)
     assert count == 90
+
 
     # test with offset
     user_chunks = dao_w_users.user.get_chunk_iterator(offset=50, chunk_size=5)

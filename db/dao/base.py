@@ -12,6 +12,7 @@ from sqlalchemy import (
     UnaryExpression,
     desc,
     ColumnElement,
+    Row,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped
@@ -91,9 +92,11 @@ class BaseDAO(Generic[Model]):
             stmt = stmt.where(*whereclauses)
         if offset:
             stmt = stmt.offset(offset)
-        result = await self.session.stream(stmt.execution_options(yield_per=chunk_size))
-        async for batch in result.partitions():
-            yield batch
+        stream = await self.session.stream(stmt.execution_options(yield_per=chunk_size))
+        async for chunk in stream.partitions():
+            chunk: list[Row]
+            chunk = [x[0] for x in chunk]  # extract objects from Row
+            yield chunk
 
     async def get_last(
         self,
