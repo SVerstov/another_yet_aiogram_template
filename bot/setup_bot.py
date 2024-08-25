@@ -1,4 +1,5 @@
 from aiogram import Dispatcher, Bot
+from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder
 from loguru import logger
 from redis.asyncio import Redis
@@ -57,7 +58,8 @@ def get_redis_storage(config):
 def run_bot(config: Config):
     bot = Bot(
         token=config.bot.token,
-        parse_mode=config.bot.parse_mode,
+        # parse_mode=config.bot.parse_mode,
+        default=DefaultBotProperties(parse_mode='HTML')
     )
     dp = setup_dp(config)
 
